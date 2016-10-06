@@ -1,14 +1,14 @@
 package visual;
 
-import clienteServidor.Cliente;
 import clienteServidor.MicroNucleo;
-import clienteServidor.Servidor;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class VentanaMicroNucleo extends JFrame implements ActionListener{
+
+    int contadorProcesos = 1;
 
     private JLabel lblMaquinaDestino;
     private JLabel lblProceso;
@@ -21,9 +21,6 @@ public class VentanaMicroNucleo extends JFrame implements ActionListener{
 
     private JButton btnCliente;
     private JButton btnServidor;
-
-    private MicroNucleo microNucleo;
-
 
     public VentanaMicroNucleo() {
 
@@ -65,14 +62,11 @@ public class VentanaMicroNucleo extends JFrame implements ActionListener{
         btnServidor.setBounds(250, 380, 80, 30);
         add(btnServidor);
 
-        microNucleo = new MicroNucleo();
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 450);
         setResizable(false);
         setVisible(true);
     }
-
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -80,16 +74,16 @@ public class VentanaMicroNucleo extends JFrame implements ActionListener{
         if(e.getSource() == btnCliente) {
 
 
-            Cliente cliente = new Cliente(microNucleo.listaProcesos.size());
-            imprimirMensjae("Inicio de proceso Cliente: " + microNucleo.listaProcesos.size());
-            microNucleo.crearProceso(cliente);
+            VentanaCliente cliente = new VentanaCliente();
+
+            contadorProcesos++;
 
         }
         else if (e.getSource() == btnServidor) {
 
-            Servidor servidor = new Servidor(microNucleo.listaProcesos.size());
-            imprimirMensjae("Inicio Proceso Servidor: " + microNucleo.listaProcesos.size());
-            microNucleo.crearProceso(servidor);
+            VentanaServidor servidor = new VentanaServidor(contadorProcesos);
+
+            contadorProcesos++;
 
         }
 

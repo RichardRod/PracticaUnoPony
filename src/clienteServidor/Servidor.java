@@ -2,71 +2,68 @@ package clienteServidor;
 
 import visual.VentanaServidor;
 
+import javax.swing.*;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * Created by Ricardo on 10/5/16.
  */
-public class Servidor extends Proceso {
+public class Servidor implements Runnable{
 
-    VentanaServidor ventana;
+    private JTextField txtId;
+    private JTextArea txtEventos;
+    private JButton btnCerrar;
+    private int id;
 
-
-    public Servidor(int id) {
-
-        super(id);
-        ventana = new VentanaServidor();
-
-
-
-        iniciarHilo();
-
-
+    public Servidor(JTextField txtId, JTextArea txtEventos, JButton btnCerrar, int id) {
+        this.txtId = txtId;
+        this.txtEventos = txtEventos;
+        this.btnCerrar = btnCerrar;
+        this.id = id;
     }
 
-    private void iniciarHilo() {
-        new Thread(this).start();
-    }
 
     @Override
     public void run() {
 
         System.out.println("Hilo iniciado");
+        txtId.setText(String.valueOf(id));
 
-        ventana.txtId.setText(String.valueOf(getID()));
+        int puertoEntrada = 8080;
 
+        ServerSocket servidor;
+        Socket cliente;
 
-        for (int i = 0; i < 100000; i++) {
-            ventana.txtEventos.setText("vaselina");
-        }
-
-        DatagramSocket socket;
-        DatagramPacket packet;
-
-        int puerto = 8080;
-
-        byte[] buffer = new byte[1024];
-
-        ventana.txtEventos.setText("Socket iniciado en el puerto: " + puerto + "\n");
+        txtEventos.setText("Socket iniciado en el puerto: " + puertoEntrada + "\n");
 
         try
         {
-            socket = new DatagramSocket(puerto);
-
-            packet = new DatagramPacket(buffer, buffer.length);
+            servidor = new ServerSocket(puertoEntrada);
 
             while (true)
             {
-                socket.receive(packet);
-                System.out.println("Bucle");
+                cliente = servidor.accept();
+                DataInputStream stream = new DataInputStream(cliente.getInputStream());
 
+                byte mensaje[] = new byte[1024];
 
+                stream.read(mensaje);
+
+                for(byte b: mensaje)
+                {
+                    txtEventos.append("Emisor: " + cliente.getInetAddress().getHostAddress() + ": " + (char)b + "\n");
+                }
+
+                cliente.close();
             }
+
         } catch (IOException ex) {
-
+            JOptionPane.showMessageDialog(null, ex.toString());
         }
-
     }
 }//fin de la clase

@@ -1,5 +1,7 @@
 package visual;
 
+import clienteServidor.Cliente;
+
 import javax.swing.*;
 
 /**
@@ -15,7 +17,7 @@ public class VentanaCliente extends JFrame {
 
     private JLabel lblOperacion;
     private JComboBox comboOpciones;
-    private String[] opciones = {"", "Violar", "Arrempujar Frijoles", "Envaselinar"};
+    private String[] opciones = {"", "Suma", "Resta", "Multiplicacion"};
 
     private JButton btnSolicitar;
     private JButton btnCerrar;
@@ -24,6 +26,12 @@ public class VentanaCliente extends JFrame {
     private JTextField txtUno;
     private JLabel lblOpDos;
     private JTextField txtDos;
+
+    private Cliente cliente;
+
+    private String operacion;
+    private String operandoUno;
+    private String operandoDos;
 
     public VentanaCliente() {
 
@@ -85,5 +93,10 @@ public class VentanaCliente extends JFrame {
         setSize(500, 300);
         setVisible(true);
 
+
+        cliente = new Cliente(99, txtEventos, operacion, operandoUno, operandoDos, btnCerrar, comboOpciones);
     }
+
+
+
 }

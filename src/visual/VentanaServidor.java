@@ -1,5 +1,7 @@
 package visual;
 
+import clienteServidor.Servidor;
+
 import javax.swing.*;
 
 /**
@@ -15,10 +17,14 @@ public class VentanaServidor extends JFrame {
 
     private JButton btnCerrar;
 
-    public VentanaServidor() {
+    private Servidor servidor;
+    private int id;
+
+    public VentanaServidor(int id) {
 
         super("Servidor Magico");
 
+        this.id = id;
 
         setLayout(null);
 
@@ -47,6 +53,11 @@ public class VentanaServidor extends JFrame {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(500, 300);
         setVisible(true);
+
+        servidor = new Servidor(txtId, txtEventos, btnCerrar, id);
+
+        Thread hilo = new Thread(servidor);
+        hilo.start();
 
     }
 

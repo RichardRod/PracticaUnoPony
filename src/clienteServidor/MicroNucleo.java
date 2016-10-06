@@ -1,5 +1,8 @@
 package clienteServidor;
 
+import visual.VentanaCliente;
+import visual.VentanaServidor;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.LinkedList;
@@ -17,17 +20,6 @@ public class MicroNucleo implements Runnable{
     public MicroNucleo() {
 
         listaProcesos = new LinkedList<>();
-    }
-
-
-    public void crearProceso(Proceso proceso) {
-
-        listaProcesos.add(proceso);
-
-
-
-
-
     }
 
 
