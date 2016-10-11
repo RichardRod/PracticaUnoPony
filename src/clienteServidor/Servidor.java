@@ -37,7 +37,7 @@ public class Servidor implements Runnable{
         ServerSocket servidor;
         Socket cliente;
 
-        txtEventos.setText("Socket iniciado en el puerto: " + puertoEntrada + "\n");
+        txtEventos.append("Inicio de proceso\n");
 
         try
         {
@@ -50,14 +50,22 @@ public class Servidor implements Runnable{
 
                 stream.read(mensaje);
 
+                txtEventos.append("Mensaje Recibido de: " + mensaje[0] + "\n");
+                txtEventos.append("Operacion a Realizar: " + opACadena(mensaje[4]) + "\n");
+
+
+                desempacar(mensaje);
                 for(byte b: mensaje)
                 {
-                    txtEventos.append("Emisor: " + cliente.getInetAddress().getHostAddress() + ": " + (char)b + "\n");
+
+
+
+                    //txtEventos.append("IP Emisora: " + cliente.getInetAddress().getHostAddress() + ": " + b + "\n");
                 }
 
                 cliente.close();
 
-                desempacar();
+
             }
 
         } catch (IOException ex) {
@@ -65,23 +73,48 @@ public class Servidor implements Runnable{
         }
     }
 
-    private void desempacar() {
+    private void desempacar(byte[] cuajoEmpacado) {
 
         //[0][1] campoOrigen
         //[2][3] campoDestino
         //[4][5] CODOP
         //[6] .. [1023] datos relativos a la operacion
 
-        byte codop = mensaje[4];
-
-        realizarOperacion(codop);
-
-        for (int i = 6; i < mensaje.length; i++) {
+        byte codop = cuajoEmpacado[4];
+        double op1 = 0;
+        double op2 = 0;
 
 
+        String auxUno = "";
+        String auxDos = "";
 
+
+
+        boolean banderita = false;
+        for (int i = 6; i < cuajoEmpacado.length; i++) {
+
+
+
+
+            if (cuajoEmpacado[i] == 45) {
+                banderita = true;
+                i++;
+            }
+
+            if (banderita == false) {
+                auxUno += (char)cuajoEmpacado[i];
+            } else {
+                auxDos += (char)cuajoEmpacado[i];
+            }
         }
 
+        //System.out.println("P1: " + auxUno + " P2: " + auxDos);
+
+        op1 = Double.parseDouble(auxUno);
+        op2 = Double.parseDouble(auxDos);
+
+
+        txtEventos.append(String.valueOf(realizarOperacion(codop, op1, op2)) + "\n");
 
 
 
@@ -89,22 +122,48 @@ public class Servidor implements Runnable{
 
     }
 
-    private void realizarOperacion(byte codop)
+    private double realizarOperacion(byte codop, double op1, double op2)
     {
+        double resultado = 0.0;
+
         switch (codop)
         {
             case 1: //suma
-
+                resultado = op1 + op2;
                 break;
 
             case 2: //resta
-
+                resultado = op1 + op2;
                 break;
 
             case 3: //multiplicacion
-
+                resultado = op1 + op2;
                 break;
         }
+
+        return resultado;
+    }
+
+    private String opACadena(byte op) {
+
+        String retorno = "";
+
+        switch (op)
+        {
+            case 1:
+                retorno = "Suma";
+                break;
+
+            case 2:
+                retorno = "Resta";
+                break;
+
+            case 3:
+                retorno = "Multiplicacion";
+                break;
+        }
+
+        return retorno;
     }
 
 

@@ -3,11 +3,13 @@ package visual;
 import clienteServidor.Cliente;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Created by Ricardo on 10/5/16.
  */
-public class VentanaCliente extends JFrame {
+public class VentanaCliente extends JFrame implements ActionListener{
 
     private JLabel lblId;
     public JTextField txtId;
@@ -29,9 +31,8 @@ public class VentanaCliente extends JFrame {
 
     private Cliente cliente;
 
-    private String operacion;
-    private String operandoUno;
-    private String operandoDos;
+    private JTextField operandoUno;
+    private JTextField operandoDos;
 
     public VentanaCliente() {
 
@@ -94,9 +95,12 @@ public class VentanaCliente extends JFrame {
         setVisible(true);
 
 
-        cliente = new Cliente(99, txtEventos, operacion, operandoUno, operandoDos, btnCerrar, comboOpciones);
+        cliente = new Cliente(99, txtEventos, txtUno, txtDos, btnSolicitar, comboOpciones);
     }
 
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
 
+    }
 }

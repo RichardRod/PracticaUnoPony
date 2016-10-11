@@ -16,35 +16,54 @@ import java.net.Socket;
  */
 public class Cliente implements ActionListener{
 
-    private JButton btnCerrar;
+    private JButton btnSolicitar;
     private JComboBox comboOpciones;
+    private JTextArea txtEventos;
+    private JTextField operandoUno;
+    private JTextField operandoDos;
 
+    private String op1, op2;
 
     private int identificador;
+
     private byte[] mensaje;
     public VentanaCliente ventana;
 
 
     String operacion;
 
-    public Cliente(int i, JTextArea txtEventos, String operacion, String operandoUno, String operandoDos, JButton btnCerrar, JComboBox comboOpciones) {
+    public Cliente(int i, JTextArea txtEvento, JTextField operandoUno, JTextField operandoDos, JButton btnSolicitar, JComboBox comboOpciones) {
 
         this.identificador = i;
 
-        this.btnCerrar = btnCerrar;
-        this.btnCerrar.addActionListener(this);
+
+        this.txtEventos = txtEventos;
+        this.operandoUno = operandoUno;
+        this.operandoDos = operandoDos;
+
+        this.btnSolicitar = btnSolicitar;
+        this.btnSolicitar.addActionListener(this);
 
         this.comboOpciones = comboOpciones;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnCerrar) {
+        if (e.getSource() == btnSolicitar) {
 
-            establecerCODOP();
-            enviarMensaje();
-
+            if(operandoUno.getText().length() == 0 || operandoDos.getText().length() == 0 || comboOpciones.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Llena los campos");
+            } else {
+                establecerCODOP();
+                setOperandos();
+                enviarMensaje();
+            }
         }
+    }
+
+    private void setOperandos() {
+        this.op1 = operandoUno.getText();
+        this.op2 = operandoDos.getText();
     }
 
     private void establecerCODOP() {
@@ -108,9 +127,15 @@ public class Cliente implements ActionListener{
         mensaje[4] = (byte) comboOpciones.getSelectedIndex();
 
         //4 datos relativos a la operacion
-        for (int i = 0; i < mensaje.length; i++) {
-            //mensaje[i + 6] = (byte) campoOp1.charAt(0);
+        //op1 y op2
+        for (int i = 0; i < op1.length(); i++) {
+            mensaje[i + 6] = (byte) op1.charAt(i);
+        }
 
+        mensaje[6 + op1.length()] = (byte) '-';
+
+        for (int i = 0; i < op2.length(); i++) {
+            mensaje[(i + 6) + (op1.length()) + 1] = (byte) op2.charAt(i);
         }
 
     }
