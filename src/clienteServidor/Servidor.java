@@ -1,12 +1,8 @@
 package clienteServidor;
 
-import visual.VentanaServidor;
-
 import javax.swing.*;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -19,6 +15,8 @@ public class Servidor implements Runnable{
     private JTextArea txtEventos;
     private JButton btnCerrar;
     private int id;
+
+    byte mensaje[] = new byte[1024];
 
     public Servidor(JTextField txtId, JTextArea txtEventos, JButton btnCerrar, int id) {
         this.txtId = txtId;
@@ -50,8 +48,6 @@ public class Servidor implements Runnable{
                 cliente = servidor.accept();
                 DataInputStream stream = new DataInputStream(cliente.getInputStream());
 
-                byte mensaje[] = new byte[1024];
-
                 stream.read(mensaje);
 
                 for(byte b: mensaje)
@@ -60,10 +56,56 @@ public class Servidor implements Runnable{
                 }
 
                 cliente.close();
+
+                desempacar();
             }
 
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
+
+    private void desempacar() {
+
+        //[0][1] campoOrigen
+        //[2][3] campoDestino
+        //[4][5] CODOP
+        //[6] .. [1023] datos relativos a la operacion
+
+        byte codop = mensaje[4];
+
+        realizarOperacion(codop);
+
+        for (int i = 6; i < mensaje.length; i++) {
+
+
+
+        }
+
+
+
+
+
+
+    }
+
+    private void realizarOperacion(byte codop)
+    {
+        switch (codop)
+        {
+            case 1: //suma
+
+                break;
+
+            case 2: //resta
+
+                break;
+
+            case 3: //multiplicacion
+
+                break;
+        }
+    }
+
+
 }//fin de la clase
