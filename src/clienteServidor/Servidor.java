@@ -12,7 +12,7 @@ import java.net.Socket;
 /**
  * Created by Ricardo on 10/5/16.
  */
-public class Servidor implements Runnable{
+public class Servidor extends Proceso implements Runnable{
 
     private JTextField txtId;
     private JTextArea txtEventos;
@@ -22,7 +22,10 @@ public class Servidor implements Runnable{
 
     byte mensaje[] = new byte[1024];
 
-    public Servidor(JTextField txtId, JTextArea txtEventos, JButton btnCerrar, int id) {
+    public Servidor(JTextField txtId, JTextArea txtEventos, JButton btnCerrar, int id, int puertoEntrada, int puertoSalida) {
+
+        super(puertoEntrada, puertoSalida);
+
         this.txtId = txtId;
         this.txtEventos = txtEventos;
         this.btnCerrar = btnCerrar;
@@ -36,7 +39,7 @@ public class Servidor implements Runnable{
         System.out.println("Hilo iniciado");
         txtId.setText(String.valueOf(id));
 
-        int puertoEntrada = 8081;
+        int puerco = getPuertoEntrada();
 
         ServerSocket servidor;
         Socket cliente;
@@ -45,7 +48,7 @@ public class Servidor implements Runnable{
 
         try
         {
-            servidor = new ServerSocket(puertoEntrada);
+            servidor = new ServerSocket(puerco);
 
             while (true)
             {
@@ -196,13 +199,13 @@ public class Servidor implements Runnable{
 
     private void enviarRespuesta(byte mensaje[]) {
 
-        String host = VentanaMicroNucleo.obtenerDireccionIP();
+        /*String host = MicroNucleo.obtenerDireccionIP();
 
-        int puerto = 8082;
+        int puerco = getPuertoSalida();
 
         try {
 
-            Socket cliente = new Socket(host, puerto);
+            Socket cliente = new Socket(host, puerco);
             DataOutputStream flujo = new DataOutputStream(cliente.getOutputStream());
 
             flujo.write(mensaje);
@@ -210,7 +213,10 @@ public class Servidor implements Runnable{
 
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        }*/
+
+        System.out.println("Cliente destino: " + mensaje[2]);
+        MicroNucleo.enviarMensaje(mensaje[2], mensaje);
     }
 
 }//fin de la clase

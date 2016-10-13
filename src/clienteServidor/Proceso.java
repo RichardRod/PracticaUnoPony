@@ -5,21 +5,30 @@ import javax.swing.*;
 /**
  * Created by Ricardo on 10/5/16.
  */
-public class Proceso extends Thread {
+public class Proceso {
 
-    private int ID;
+    //atributos
+    private int puertoEntrada;
+    private int puertoSalida;
 
-
-    public void setID(int ID) {
-        this.ID = ID;
+    public Proceso(int puertoEntrada, int puertoSalida) {
+        this.puertoEntrada = puertoEntrada;
+        this.puertoSalida = puertoSalida;
     }
 
-    public int getID() {
-        return ID;
+    public void setPuertoEntrada(int puertoEntrada) {
+        this.puertoEntrada = puertoEntrada;
     }
 
-    public Proceso(int id) {
-        this.ID = id;
+    public void setPuertoSalida(int puertoSalida) {
+        this.puertoSalida = puertoSalida;
+    }
 
+    public int getPuertoEntrada() {
+        return puertoEntrada;
+    }
+
+    public int getPuertoSalida() {
+        return puertoSalida;
     }
 }

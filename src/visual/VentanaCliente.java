@@ -29,16 +29,22 @@ public class VentanaCliente extends JFrame implements ActionListener{
     private JLabel lblOpDos;
     private JTextField txtDos;
 
-    private Cliente cliente;
+    private int id;
 
-    private JTextField operandoUno;
-    private JTextField operandoDos;
+    //puertos
+    int puertoEntrada;
+    int puertoSalida;
 
-    public VentanaCliente() {
+
+    public VentanaCliente(int id, int puertoEntrada, int puertoSalida) {
 
         super("Cliente");
 
         setLayout(null);
+
+        this.id = id;
+        this.puertoEntrada = puertoEntrada;
+        this.puertoSalida = puertoSalida;
 
         lblId = new JLabel("ID:");
         lblId.setBounds(200, 10, 50, 30);
@@ -97,11 +103,24 @@ public class VentanaCliente extends JFrame implements ActionListener{
 
 
 
-        Thread hiloCliente = new Thread(new Cliente(99, txtEventos, txtUno, txtDos, btnSolicitar, comboOpciones));
+        Thread hiloCliente = new Thread(new Cliente(id, txtId, txtEventos, txtUno, txtDos, btnSolicitar, comboOpciones, puertoEntrada, puertoSalida));
         hiloCliente.start();
 
 
     }
+
+    public int getPuertoEntrada() {
+        return puertoEntrada;
+    }
+
+    public int getPuertoSalida() {
+        return puertoSalida;
+    }
+
+    public void setPuertoSalida(int puertoSalida) {
+        this.puertoSalida = puertoSalida;
+    }
+
 
 
     @Override

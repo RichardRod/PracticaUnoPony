@@ -16,10 +16,11 @@ import java.net.Socket;
 /**
  * Created by Ricardo on 10/5/16.
  */
-public class Cliente implements ActionListener, Runnable{
+public class Cliente extends Proceso implements ActionListener, Runnable{
 
     private JButton btnSolicitar;
     private JComboBox comboOpciones;
+    private JTextField txtId;
     private JTextArea txtEventos;
     private JTextField operandoUno;
     private JTextField operandoDos;
@@ -30,10 +31,16 @@ public class Cliente implements ActionListener, Runnable{
 
     String operacion;
 
-    public Cliente(int i, JTextArea txtEventos, JTextField operandoUno, JTextField operandoDos, JButton btnSolicitar, JComboBox comboOpciones) {
+    private VentanaMicroNucleo ventanaMicroNucleo;
 
-        this.identificador = i;
+    public Cliente(int identificador, JTextField txtId, JTextArea txtEventos, JTextField operandoUno, JTextField operandoDos, JButton btnSolicitar, JComboBox comboOpciones, int puertoEntrada, int puertoSalida) {
 
+        super(puertoEntrada, puertoSalida);
+
+        System.out.println("Cliente.java: " + getPuertoEntrada());
+
+        this.txtId = txtId;
+        this.identificador = identificador;
 
         this.txtEventos = txtEventos;
         this.operandoUno = operandoUno;
@@ -95,25 +102,32 @@ public class Cliente implements ActionListener, Runnable{
     }
 
     private void enviarMensaje() {
-        int puertoEntrada = 8081;
-        String host = VentanaMicroNucleo.obtenerDireccionIP();
+
+        byte[] mensaje = new byte[1024];
+
+        /*int puerco = getPuertoSalida();
+        String host = MicroNucleo.obtenerDireccionIP();
 
         try {
             //socket para enviar datos
-            Socket cliente = new Socket(host, puertoEntrada);
+            Socket cliente = new Socket(host, puerco);
             //flujo para el envio de datos
             DataOutputStream flujoEnvio = new DataOutputStream(cliente.getOutputStream());
 
 
-            byte[] mensaje = new byte[1024];
 
-            empacarMensaje(mensaje);
+
+
 
             flujoEnvio.write(mensaje);
             cliente.close();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        }*/
+
+        empacarMensaje(mensaje);
+
+        MicroNucleo.enviarMensaje(MicroNucleo.obtenerProcesoDestino(), mensaje);
     }
 
     private void empacarMensaje(byte[] mensaje) {
@@ -127,7 +141,7 @@ public class Cliente implements ActionListener, Runnable{
         mensaje[0] = (byte) identificador;
 
         //2 campo destino
-        mensaje[2] = (byte) VentanaMicroNucleo.obtenerProcesoDestino();
+        mensaje[2] = (byte) MicroNucleo.obtenerProcesoDestino();
 
         //3 codigo de operacion
         mensaje[4] = (byte) comboOpciones.getSelectedIndex();
@@ -181,16 +195,18 @@ public class Cliente implements ActionListener, Runnable{
 
         System.out.println("Cliente Runneable");
 
+        establecerIdentificador();
+
         txtEventos.append("Inicio de Proceso.\n");
 
-        int puertoEntrada = 8082;
+        int puerco = getPuertoEntrada();
         ServerSocket servidor;
         Socket cliente;
 
         byte[] respuestaServidor = new byte[1024];
 
         try {
-            servidor = new ServerSocket(puertoEntrada);
+            servidor = new ServerSocket(puerco);
 
             while (true) {
 
@@ -222,5 +238,9 @@ public class Cliente implements ActionListener, Runnable{
 
         txtEventos.append("Respuesta recibida por el servidor: " + mensaje[0] + "\n");
         txtEventos.append("Resultado: " + respuesta);
+    }
+
+    private void establecerIdentificador() {
+        txtId.setText(String.valueOf(identificador));
     }
 }

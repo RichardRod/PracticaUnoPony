@@ -1,13 +1,13 @@
 package visual;
 
-import clienteServidor.Servidor;
+import clienteServidor.*;
 
 import javax.swing.*;
 
 /**
  * Created by Ricardo on 10/5/16.
  */
-public class VentanaServidor extends JFrame {
+public class VentanaServidor extends JFrame implements clienteServidor.ProcesoFrame{
 
     private JLabel lblId;
     public JTextField txtId;
@@ -20,11 +20,19 @@ public class VentanaServidor extends JFrame {
     private Servidor servidor;
     private int id;
 
-    public VentanaServidor(int id) {
+    private int puertoEntrada;
+    private int puertoSalida;
+
+    public VentanaServidor(int id, int puertoEntrada, int puertoSalida) {
 
         super("Servidor Magico");
 
         this.id = id;
+        this.puertoEntrada = puertoEntrada;
+        this.puertoSalida = puertoSalida;
+
+        System.out.println("Entrada: " + puertoEntrada);
+        System.out.println("Salida: " + puertoSalida);
 
         setLayout(null);
 
@@ -54,12 +62,22 @@ public class VentanaServidor extends JFrame {
         setSize(500, 300);
         setVisible(true);
 
-        servidor = new Servidor(txtId, txtEventos, btnCerrar, id);
+        servidor = new Servidor(txtId, txtEventos, btnCerrar, id, puertoEntrada, puertoSalida);
 
         Thread hilo = new Thread(servidor);
         hilo.start();
 
     }
 
+    public int getPuertoEntrada() {
+        return puertoEntrada;
+    }
 
+    public int getPuertoSalida() {
+        return puertoSalida;
+    }
+
+    public void setPuertoSalida(int puertoSalida) {
+        this.puertoSalida = puertoSalida;
+    }
 }

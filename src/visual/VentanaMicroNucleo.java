@@ -5,10 +5,9 @@ import clienteServidor.MicroNucleo;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Hashtable;
 
-public class VentanaMicroNucleo extends JFrame implements ActionListener{
-
-    int contadorProcesos = 1;
+public class VentanaMicroNucleo extends JFrame{
 
     private JLabel lblMaquinaDestino;
     private JLabel lblProceso;
@@ -21,6 +20,7 @@ public class VentanaMicroNucleo extends JFrame implements ActionListener{
 
     private JButton btnCliente;
     private JButton btnServidor;
+
 
     public VentanaMicroNucleo() {
 
@@ -53,12 +53,10 @@ public class VentanaMicroNucleo extends JFrame implements ActionListener{
         add(scrollEventos);
 
         btnCliente = new JButton("Cliente");
-        btnCliente.addActionListener(this);
         btnCliente.setBounds(150, 380, 80, 30);
         add(btnCliente);
 
         btnServidor = new JButton("Servidor");
-        btnServidor.addActionListener(this);
         btnServidor.setBounds(250, 380, 80, 30);
         add(btnServidor);
 
@@ -66,48 +64,9 @@ public class VentanaMicroNucleo extends JFrame implements ActionListener{
         setSize(500, 450);
         setResizable(false);
         setVisible(true);
+
+        Thread hiloMicroNucleo = new Thread(new MicroNucleo(txtEventos, btnCliente, btnServidor, txtMaquinaDestino, txtProceso));
+        hiloMicroNucleo.start();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        if(e.getSource() == btnCliente) {
-
-
-            VentanaCliente cliente = new VentanaCliente();
-
-            contadorProcesos++;
-
-        }
-        else if (e.getSource() == btnServidor) {
-
-            VentanaServidor servidor = new VentanaServidor(contadorProcesos);
-
-            contadorProcesos++;
-
-        }
-
-    }
-
-    private void imprimirMensjae(String mensaje) {
-        txtEventos.append(mensaje + "\n");
-    }
-
-    public static String obtenerDireccionIP() {
-
-        if(txtMaquinaDestino.getText().length() != 0) {
-            return txtMaquinaDestino.getText();
-        } else {
-            return "127.0.0.1";
-        }
-    }
-
-    public static int obtenerProcesoDestino() {
-
-        if(txtProceso.getText().length() != 0) {
-            return Integer.parseInt(txtProceso.getText());
-        } else {
-            return -1;
-        }
-    }
 }
