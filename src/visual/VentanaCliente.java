@@ -19,7 +19,7 @@ public class VentanaCliente extends JFrame implements ActionListener{
 
     private JLabel lblOperacion;
     private JComboBox comboOpciones;
-    private String[] opciones = {"", "Suma", "Resta", "Multiplicacion"};
+    private String[] opciones = {"", "Suma", "Resta", "Multiplicacion", "Division", "Potencia"};
 
     private JButton btnSolicitar;
     private JButton btnCerrar;
@@ -95,7 +95,12 @@ public class VentanaCliente extends JFrame implements ActionListener{
         setVisible(true);
 
 
-        cliente = new Cliente(99, txtEventos, txtUno, txtDos, btnSolicitar, comboOpciones);
+
+
+        Thread hiloCliente = new Thread(new Cliente(99, txtEventos, txtUno, txtDos, btnSolicitar, comboOpciones));
+        hiloCliente.start();
+
+
     }
 
 
@@ -103,4 +108,5 @@ public class VentanaCliente extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e) {
 
     }
+
 }

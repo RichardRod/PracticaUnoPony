@@ -1,7 +1,10 @@
 package clienteServidor;
 
+import visual.VentanaMicroNucleo;
+
 import javax.swing.*;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,6 +18,7 @@ public class Servidor implements Runnable{
     private JTextArea txtEventos;
     private JButton btnCerrar;
     private int id;
+    private double respuestaOperacion;
 
     byte mensaje[] = new byte[1024];
 
@@ -32,7 +36,7 @@ public class Servidor implements Runnable{
         System.out.println("Hilo iniciado");
         txtId.setText(String.valueOf(id));
 
-        int puertoEntrada = 8080;
+        int puertoEntrada = 8081;
 
         ServerSocket servidor;
         Socket cliente;
@@ -50,28 +54,25 @@ public class Servidor implements Runnable{
 
                 stream.read(mensaje);
 
-                txtEventos.append("Mensaje Recibido de: " + mensaje[0] + "\n");
-                txtEventos.append("Operacion a Realizar: " + opACadena(mensaje[4]) + "\n");
-
+                txtEventos.append("Mensaje Recibido del cliente: " + mensaje[0] + ".\n");
+                txtEventos.append("Operacion a Realizar: " + opACadena(mensaje[4]) + ".\n");
 
                 desempacar(mensaje);
-                for(byte b: mensaje)
-                {
 
 
 
-                    //txtEventos.append("IP Emisora: " + cliente.getInetAddress().getHostAddress() + ": " + b + "\n");
-                }
+                enviarRespuesta(empacarMensaje()); //puede haber pedos
 
                 cliente.close();
 
 
-            }
+            }//fin de while
 
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, ex.toString());
-        }
-    }
+        }//fin de try-catch
+
+    }//fin del metodo run
 
     private void desempacar(byte[] cuajoEmpacado) {
 
@@ -93,9 +94,6 @@ public class Servidor implements Runnable{
         boolean banderita = false;
         for (int i = 6; i < cuajoEmpacado.length; i++) {
 
-
-
-
             if (cuajoEmpacado[i] == 45) {
                 banderita = true;
                 i++;
@@ -108,18 +106,12 @@ public class Servidor implements Runnable{
             }
         }
 
-        //System.out.println("P1: " + auxUno + " P2: " + auxDos);
-
         op1 = Double.parseDouble(auxUno);
         op2 = Double.parseDouble(auxDos);
 
 
-        txtEventos.append(String.valueOf(realizarOperacion(codop, op1, op2)) + "\n");
-
-
-
-
-
+        respuestaOperacion = realizarOperacion(codop, op1, op2);
+        txtEventos.append("Resultado: " + String.valueOf(respuestaOperacion) + ".\n");
     }
 
     private double realizarOperacion(byte codop, double op1, double op2)
@@ -133,11 +125,19 @@ public class Servidor implements Runnable{
                 break;
 
             case 2: //resta
-                resultado = op1 + op2;
+                resultado = op1 - op2;
                 break;
 
             case 3: //multiplicacion
-                resultado = op1 + op2;
+                resultado = op1 * op2;
+                break;
+
+            case 4:
+                resultado = op1 / op2;
+                break;
+
+            case 5:
+                resultado = Math.pow(op1, op2);
                 break;
         }
 
@@ -161,10 +161,56 @@ public class Servidor implements Runnable{
             case 3:
                 retorno = "Multiplicacion";
                 break;
+
+            case 4:
+                retorno = "Division";
+                break;
+
+            case 5:
+                retorno = "Potencia";
+                break;
         }
 
         return retorno;
     }
 
+    private byte[] empacarMensaje() {
+
+        //[0][1] Id servidor
+        //[2][3] Id cliente solicitante
+        //[4]..[1023] datos relativos a la respuesta
+
+        String respuesta = String.valueOf(respuestaOperacion);
+
+        byte[] cuajoEmpacado = new byte[1024];
+
+        cuajoEmpacado[0] = (byte) id;
+        cuajoEmpacado[2] = mensaje[0];
+
+        for (int i = 0; i < respuesta.length(); i++) {
+            cuajoEmpacado[i + 4] = (byte) respuesta.charAt(i);
+        }
+
+        return cuajoEmpacado;
+    }
+
+    private void enviarRespuesta(byte mensaje[]) {
+
+        String host = VentanaMicroNucleo.obtenerDireccionIP();
+
+        int puerto = 8082;
+
+        try {
+
+            Socket cliente = new Socket(host, puerto);
+            DataOutputStream flujo = new DataOutputStream(cliente.getOutputStream());
+
+            flujo.write(mensaje);
+            flujo.close();
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
 }//fin de la clase

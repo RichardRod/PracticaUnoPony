@@ -7,14 +7,16 @@ import visual.VentanaServidor;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
  * Created by Ricardo on 10/5/16.
  */
-public class Cliente implements ActionListener{
+public class Cliente implements ActionListener, Runnable{
 
     private JButton btnSolicitar;
     private JComboBox comboOpciones;
@@ -26,13 +28,9 @@ public class Cliente implements ActionListener{
 
     private int identificador;
 
-    private byte[] mensaje;
-    public VentanaCliente ventana;
-
-
     String operacion;
 
-    public Cliente(int i, JTextArea txtEvento, JTextField operandoUno, JTextField operandoDos, JButton btnSolicitar, JComboBox comboOpciones) {
+    public Cliente(int i, JTextArea txtEventos, JTextField operandoUno, JTextField operandoDos, JButton btnSolicitar, JComboBox comboOpciones) {
 
         this.identificador = i;
 
@@ -84,12 +82,20 @@ public class Cliente implements ActionListener{
                 this.operacion = "3";
                 System.out.println(operacion);
                 break;
+
+            case 4:
+                this.operacion = "4";
+                break;
+
+            case 5:
+                this.operacion = "5";
+                break;
         }
 
     }
 
     private void enviarMensaje() {
-        int puertoEntrada = 8080;
+        int puertoEntrada = 8081;
         String host = VentanaMicroNucleo.obtenerDireccionIP();
 
         try {
@@ -157,8 +163,64 @@ public class Cliente implements ActionListener{
             case "3":
                 retorno = "Multiplicacion";
                 break;
+
+            case "4":
+                retorno = "Division";
+                break;
+
+            case "5":
+                retorno = "Potencia";
+                break;
         }
 
         return retorno;
+    }
+
+    @Override
+    public void run() {
+
+        System.out.println("Cliente Runneable");
+
+        txtEventos.append("Inicio de Proceso.\n");
+
+        int puertoEntrada = 8082;
+        ServerSocket servidor;
+        Socket cliente;
+
+        byte[] respuestaServidor = new byte[1024];
+
+        try {
+            servidor = new ServerSocket(puertoEntrada);
+
+            while (true) {
+
+                cliente = servidor.accept();
+                DataInputStream stream = new DataInputStream(cliente.getInputStream());
+
+                txtEventos.append("Invocando a Receive().\n");
+                stream.read(respuestaServidor);
+
+                txtEventos.append("Desempacando Respuesta del servidor...\n");
+                desempacar(respuestaServidor);
+
+                cliente.close();
+
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }//fin de try-catch
+    }
+
+    private void desempacar(byte mensaje[]) {
+
+        System.out.println("Cliente.java");
+        String respuesta = "";
+
+        for (int i = 4; i < mensaje.length; i++) {
+            respuesta += (char)mensaje[i];
+        }
+
+        txtEventos.append("Respuesta recibida por el servidor: " + mensaje[0] + "\n");
+        txtEventos.append("Resultado: " + respuesta);
     }
 }
