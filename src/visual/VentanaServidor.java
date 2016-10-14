@@ -62,7 +62,7 @@ public class VentanaServidor extends JFrame implements clienteServidor.ProcesoFr
         setSize(500, 300);
         setVisible(true);
 
-        servidor = new Servidor(txtId, txtEventos, btnCerrar, id, puertoEntrada, puertoSalida);
+        servidor = new Servidor(txtId, txtEventos, btnCerrar, id, puertoEntrada, puertoSalida, this);
 
         Thread hilo = new Thread(servidor);
         hilo.start();

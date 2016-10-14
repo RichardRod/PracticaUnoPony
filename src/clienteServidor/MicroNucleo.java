@@ -4,6 +4,7 @@ import visual.VentanaCliente;
 import visual.VentanaServidor;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -13,6 +14,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +46,10 @@ public class MicroNucleo implements Runnable, ActionListener {
     VentanaCliente cliente;
     VentanaServidor servidor;
 
-    public MicroNucleo(JTextArea txtEventos, JButton btnCliente, JButton btnServidor, JTextField txtMaquinaDestino, JTextField txtProceso) {
+    private static JTable tablaProcesos;
+    private JButton btnEliminar;
+
+    public MicroNucleo(JTextArea txtEventos, JButton btnCliente, JButton btnServidor, JTextField txtMaquinaDestino, JTextField txtProceso, JTable tablaProcesos, JButton btnEliminar) {
 
         this.txtEventos = txtEventos;
 
@@ -59,6 +64,11 @@ public class MicroNucleo implements Runnable, ActionListener {
 
         listaClientes = new Hashtable<>();
         listaServidores = new Hashtable<>();
+
+        MicroNucleo.tablaProcesos = tablaProcesos;
+
+        this.btnEliminar = btnEliminar;
+        this.btnEliminar.addActionListener(this);
     }
 
     @Override
@@ -75,6 +85,8 @@ public class MicroNucleo implements Runnable, ActionListener {
                 cliente = new VentanaCliente(contadorProcesos, puertoEntrada, setPuertoSalida());
 
                 listaClientes.put(contadorProcesos, cliente);
+
+                registrarProceso(contadorProcesos, "Cliente");
                 contadorProcesos++;
 
 
@@ -89,8 +101,9 @@ public class MicroNucleo implements Runnable, ActionListener {
 
                 servidor = new VentanaServidor(contadorProcesos, setPuertoEntrada(), setPuertoSalida());
 
-
                 listaServidores.put(contadorProcesos, servidor);
+
+                registrarProceso(contadorProcesos, "Servidor");
 
                 contadorProcesos++;
 
@@ -98,7 +111,98 @@ public class MicroNucleo implements Runnable, ActionListener {
             } else {
                 JOptionPane.showMessageDialog(null, "No puedes agregar mas Servidores");
             }
+        } else if (e.getSource() == btnEliminar) {
+            eliminarProceso();
         }
+    }
+
+    private static void eliminarProceso() {
+
+        int indice = tablaProcesos.getSelectedRow();
+
+        DefaultTableModel model = (DefaultTableModel) tablaProcesos.getModel();
+        int id = (int)model.getValueAt(indice, 0);
+
+        System.out.println("Casteo alv: " + id);
+
+        boolean banderazo = false;
+        String tipo = "";
+
+        Enumeration<Integer> enumeracionClientes = listaClientes.keys();
+        Enumeration<Integer> enumeracionServidores = listaServidores.keys();
+
+        while (enumeracionClientes.hasMoreElements()) {
+
+            if(id == enumeracionClientes.nextElement()) {
+                banderazo = true;
+                System.out.println("Encontrado cliente: " + indice);
+                tipo = "cliente";
+            }
+        }
+
+        while (enumeracionServidores.hasMoreElements()) {
+            if(id == enumeracionServidores.nextElement()) {
+                banderazo = true;
+                System.out.println("Encontrado servidor: " + indice);
+                tipo = "servidor";
+            }
+        }
+
+        System.out.println("Indice: " + indice + " id: " + id);
+
+        if(banderazo == true) {
+            //proceso de dar cran
+
+            switch (tipo) {
+                case "cliente":
+                    MicroNucleo.listaClientes.remove(id);
+
+                    //recorrer el cuajo
+                    ((DefaultTableModel) tablaProcesos.getModel()).removeRow(indice);
+                    tablaProcesos.addNotify();
+                    break;
+
+                case "servidor":
+                    MicroNucleo.listaServidores.remove(id);
+
+                    //recorrer el cuajo
+                    ((DefaultTableModel) tablaProcesos.getModel()).removeRow(indice);
+                    tablaProcesos.addNotify();
+                    break;
+            }
+        }
+    }
+
+    public static void eliminarProcesoVentana(int id, String tipo, Proceso procesoATronar) {
+
+        System.out.println("Eliminar: " + id);
+
+        DefaultTableModel model = (DefaultTableModel) tablaProcesos.getModel();
+        //int aux = (int)model.getValueAt(indice, 0);
+
+        for (int i = 0; i < tablaProcesos.getRowCount(); i++) {
+
+            if (id == (int)model.getValueAt(i, 0)) {
+                model.removeRow(i);
+            }
+
+        }
+
+        tablaProcesos.addNotify();
+
+
+        switch (tipo) {
+            case "cliente":
+                listaClientes.remove(id);
+                ((Cliente) procesoATronar).tronar();
+                break;
+
+            case "servidor":
+                listaServidores.remove(id);
+                ((Servidor) procesoATronar).tronar();
+                break;
+        }
+
     }
 
     @Override
@@ -199,5 +303,19 @@ public class MicroNucleo implements Runnable, ActionListener {
     public int setPuertoSalida() {
 
         return (8112 + contadorProcesos);
+    }
+
+    public void registrarProceso(int id, String tipo) {
+
+        DefaultTableModel modelo = (DefaultTableModel) tablaProcesos.getModel();
+
+        txtEventos.append("Registrando proceso: " + id + " : " + tipo + "\n");
+        Object[] fila = new Object[2];
+
+        fila[0] = id;
+        fila[1] = tipo;
+
+        modelo.addRow(fila);
+        tablaProcesos.setModel(modelo);
     }
 }

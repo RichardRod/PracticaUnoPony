@@ -103,7 +103,7 @@ public class VentanaCliente extends JFrame implements ActionListener{
 
 
 
-        Thread hiloCliente = new Thread(new Cliente(id, txtId, txtEventos, txtUno, txtDos, btnSolicitar, comboOpciones, puertoEntrada, puertoSalida));
+        Thread hiloCliente = new Thread(new Cliente(id, txtId, txtEventos, txtUno, txtDos, btnSolicitar, comboOpciones, puertoEntrada, puertoSalida, btnCerrar, this));
         hiloCliente.start();
 
 

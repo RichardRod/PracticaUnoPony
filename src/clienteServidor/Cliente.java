@@ -7,6 +7,7 @@ import visual.VentanaServidor;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,9 +32,10 @@ public class Cliente extends Proceso implements ActionListener, Runnable{
 
     String operacion;
 
-    private VentanaMicroNucleo ventanaMicroNucleo;
+    private JButton btnCerrar;
+    private JFrame fierroPariente;
 
-    public Cliente(int identificador, JTextField txtId, JTextArea txtEventos, JTextField operandoUno, JTextField operandoDos, JButton btnSolicitar, JComboBox comboOpciones, int puertoEntrada, int puertoSalida) {
+    public Cliente(int identificador, JTextField txtId, JTextArea txtEventos, JTextField operandoUno, JTextField operandoDos, JButton btnSolicitar, JComboBox comboOpciones, int puertoEntrada, int puertoSalida, JButton btnCerrar, JFrame fierroPariente) {
 
         super(puertoEntrada, puertoSalida);
 
@@ -50,6 +52,11 @@ public class Cliente extends Proceso implements ActionListener, Runnable{
         this.btnSolicitar.addActionListener(this);
 
         this.comboOpciones = comboOpciones;
+
+        this.btnCerrar = btnCerrar;
+        this.btnCerrar.addActionListener(this);
+
+        this.fierroPariente = fierroPariente;
     }
 
     @Override
@@ -63,6 +70,8 @@ public class Cliente extends Proceso implements ActionListener, Runnable{
                 setOperandos();
                 enviarMensaje();
             }
+        } else if(e.getSource() == btnCerrar) {
+            MicroNucleo.eliminarProcesoVentana(this.identificador, "cliente", this);
         }
     }
 
@@ -242,5 +251,15 @@ public class Cliente extends Proceso implements ActionListener, Runnable{
 
     private void establecerIdentificador() {
         txtId.setText(String.valueOf(identificador));
+    }
+
+    public void tronar(){
+        try {
+            fierroPariente.setVisible(false);
+            fierroPariente.dispose();
+            this.finalize();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 }

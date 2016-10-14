@@ -3,6 +3,8 @@ package clienteServidor;
 import visual.VentanaMicroNucleo;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -12,7 +14,7 @@ import java.net.Socket;
 /**
  * Created by Ricardo on 10/5/16.
  */
-public class Servidor extends Proceso implements Runnable{
+public class Servidor extends Proceso implements Runnable, ActionListener{
 
     private JTextField txtId;
     private JTextArea txtEventos;
@@ -20,16 +22,21 @@ public class Servidor extends Proceso implements Runnable{
     private int id;
     private double respuestaOperacion;
 
+    private JFrame fierroPariente;
+
     byte mensaje[] = new byte[1024];
 
-    public Servidor(JTextField txtId, JTextArea txtEventos, JButton btnCerrar, int id, int puertoEntrada, int puertoSalida) {
+    public Servidor(JTextField txtId, JTextArea txtEventos, JButton btnCerrar, int id, int puertoEntrada, int puertoSalida, JFrame fierroPariente) {
 
         super(puertoEntrada, puertoSalida);
 
         this.txtId = txtId;
         this.txtEventos = txtEventos;
         this.btnCerrar = btnCerrar;
+        this.btnCerrar.addActionListener(this);
+
         this.id = id;
+        this.fierroPariente = fierroPariente;
     }
 
 
@@ -219,4 +226,20 @@ public class Servidor extends Proceso implements Runnable{
         MicroNucleo.enviarMensaje(mensaje[2], mensaje);
     }
 
+    public void tronar(){
+        try {
+            fierroPariente.setVisible(false);
+            fierroPariente.dispose();
+            this.finalize();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnCerrar) {
+            MicroNucleo.eliminarProcesoVentana(id,"servidor", this);
+        }
+    }
 }//fin de la clase

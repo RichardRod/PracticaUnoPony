@@ -3,6 +3,7 @@ package visual;
 import clienteServidor.MicroNucleo;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
@@ -21,12 +22,31 @@ public class VentanaMicroNucleo extends JFrame{
     private JButton btnCliente;
     private JButton btnServidor;
 
+    private JTable tablaProcesos;
+    private JScrollPane desplazamientoTabla;
+    private JButton btnEliminar;
+
 
     public VentanaMicroNucleo() {
 
         super("Practica 1: Cliente Servidor");
 
         setLayout(null);
+
+        tablaProcesos = new JTable(new DefaultTableModel(new Object[][]{},
+                new String[] {
+                    "ID", "Tipo"
+                }));
+        tablaProcesos.setBounds(400, 50, 300, 300);
+        add(tablaProcesos);
+
+        desplazamientoTabla = new JScrollPane(tablaProcesos);
+        desplazamientoTabla.setBounds(400, 50, 300, 300);
+        add(desplazamientoTabla);
+
+        btnEliminar = new JButton("Eliminar");
+        btnEliminar.setBounds(500, 370, 80, 30);
+        add(btnEliminar);
 
         lblMaquinaDestino = new JLabel("Maquina Destino:");
         lblMaquinaDestino.setBounds(10, 10, 200, 30);
@@ -45,27 +65,28 @@ public class VentanaMicroNucleo extends JFrame{
         add(txtProceso);
 
         txtEventos = new JTextArea();
-        txtEventos.setBounds(10, 50, 480, 300);
+        txtEventos.setBounds(10, 50, 380, 300);
+        txtEventos.setEditable(false);
         add(txtEventos);
 
         scrollEventos = new JScrollPane(txtEventos);
-        scrollEventos.setBounds(10, 50, 480, 300);
+        scrollEventos.setBounds(10, 50, 380, 300);
         add(scrollEventos);
 
         btnCliente = new JButton("Cliente");
-        btnCliente.setBounds(150, 380, 80, 30);
+        btnCliente.setBounds(150, 370, 80, 30);
         add(btnCliente);
 
         btnServidor = new JButton("Servidor");
-        btnServidor.setBounds(250, 380, 80, 30);
+        btnServidor.setBounds(250, 370, 80, 30);
         add(btnServidor);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 450);
+        setSize(715, 450);
         setResizable(false);
         setVisible(true);
 
-        Thread hiloMicroNucleo = new Thread(new MicroNucleo(txtEventos, btnCliente, btnServidor, txtMaquinaDestino, txtProceso));
+        Thread hiloMicroNucleo = new Thread(new MicroNucleo(txtEventos, btnCliente, btnServidor, txtMaquinaDestino, txtProceso, tablaProcesos, btnEliminar));
         hiloMicroNucleo.start();
     }
 
